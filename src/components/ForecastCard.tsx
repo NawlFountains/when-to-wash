@@ -12,7 +12,7 @@ export default function ForecastCard({ dayForecast }: ForecastCardProps) {
 				<h2>{formattedDate}</h2>
 			</div>
 			<div className="p-3">
-				<p>{dayForecast.precipitationProbability}% Humidity</p>
+				<p>{dayForecast.precipitationProbability}% Precipitation</p>
 				<p>{dayForecast.windspeedMax} km/h</p>
 				<p>{dayForecast.tempMax} / {dayForecast.tempMin} ºC</p>
 			</div>

@@ -47,12 +47,12 @@ describe ('Integration Test - washRating', () => {
 	it('On a rainy and windy week should return null', () => {
 		const mockForecast: DayForecast [] = [
 			mockDayForecast('2026-06-01',90,12.0,15,14,8,95), //Rain
-			mockDayForecast('2026-06-02',0,0,30,14,8,3), // Windy 
+			mockDayForecast('2026-06-02',0,0,30,35,8,3), // Windy 
 			mockDayForecast('2026-06-03',90,12.0,15,14,8,53), //Rain
-			mockDayForecast('2026-06-04',50,8.0,15,14,8,51), //Rain
-			mockDayForecast('2026-06-05',90,10.0,15,14,8,52), //Rain
+			mockDayForecast('2026-06-04',50,8.0,30,14,8,51), //Rain
+			mockDayForecast('2026-06-05',90,10.0,30,14,8,52), //Rain
 			mockDayForecast('2026-06-06',0,0,30,14,8,3), // Windy 
-			mockDayForecast('2026-06-07',0,0,15,14,8,2), // Windy 
+			mockDayForecast('2026-06-07',0,0,30,14,8,2), // Windy 
 		]
 
 		const forecastRatings: WashScore[] = []
@@ -67,7 +67,7 @@ describe ('Integration Test - washRating', () => {
 
 		const result = getOptimalWashDay(forecastWashDays)
 
-		expect(result).toBeNull
+		expect(result).toBeNull()
 	})
 
 	it('On a rainy but last day is great be optimistic it could be good', () => {

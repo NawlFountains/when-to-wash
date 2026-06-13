@@ -2,11 +2,10 @@ import { useState } from 'react'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import { divIcon } from 'leaflet'
 import LocationPicker from './components/LocationPicker'
-import { useCarWasAdvisior } from './hooks/useCarWashAdvisor'
+import { useCarWasAdvisor } from './hooks/useCarWashAdvisor'
 import WashDayGrid from './components/WashDayGrid'
 
-function App() {
-	const pinIcon= divIcon({
+const pinIcon= divIcon({
 		html: `
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32">
 			<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#d65d0e" stroke="#7c5200" stroke-width="1"/>
@@ -16,14 +15,17 @@ function App() {
 		className: '',
 		iconSize: [32, 32],
 		iconAnchor: [16, 32],
-	})
+})
+
+function App() {
+	
 	const { location,
 		setLocation,
 		recommendations,
 		loading,
 		optimalWashDay,
 		error,
-		handleRecommendations } = useCarWasAdvisior()
+		handleRecommendations } = useCarWasAdvisor()
 
   return (
     <>
@@ -31,7 +33,7 @@ function App() {
 	    <div className='flex flex-col w-full md:w-1/2 py-4 gap-4 mx-auto'>
 		    <div>
 		    <h1 className='text-xl text-center'>
-			Select your location
+		    	Want to know the best day to wash your car this week?
 		    </h1>
 		    </div>
 
@@ -53,8 +55,8 @@ function App() {
 		    </div>
 
 		    <div className='p-2 bg-gruv-fg0 w-full shadow-lg shadow-gruv-bg2/40 mx-auto rounded-lg flex flex-col gap-4'>
-			    <h2>
-				Select want to know if it's useful to wash your car
+			    <h2 className='text-center'>
+			    	Select your location on the map and then click Calculate
 			    </h2>
 
 			    <div className='flex flex-col md:flex-row w-full gap-4'>
@@ -67,13 +69,19 @@ function App() {
 			    </div>
 		    </div>
 		    {error && (<p className='text-gruv-red'>{error}</p>)}
-		    {optimalWashDay && (
-			<div>
-			Optimal wash day is {optimalWashDay.forecast.date}
-			</div>
-		    )}
 		    {recommendations && (
-			<WashDayGrid washDays={recommendations}/>
+			    <div className='flex flex-col gap-2'>
+			    <div className='text-center'>
+			    {optimalWashDay ? (
+				    <p>
+				    Optimal wash day is {optimalWashDay.forecast.date.split('-').reverse().join('/')}
+				    </p>
+			    ) : (
+				<p>It's not a good week to wash your car</p>	
+			    )}
+			    </div>
+			    <WashDayGrid washDays={recommendations}/>
+			    </div>
 		    )}
 	    </div>
     </div>

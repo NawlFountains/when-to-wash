@@ -9,7 +9,7 @@ export default function WashDayGrid({washDays} : WashDayGridProps) {
 	return (
 		<div className='flex flex-wrap gap-2 w-full justify-center'>
 		{washDays.map((washDay) => (
-				<ForecastCard dayForecast={washDay.forecast}/>
+				<ForecastCard key={washDay.forecast.date} dayForecast={washDay.forecast}/>
 		))}
 		</div>
 	)

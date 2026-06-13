@@ -4,8 +4,8 @@ import type { WashDay, WashScore } from '../types/wash'
 import {getForecast} from '../utils/weatherForecast'
 import {calculateDailyScore, getOptimalWashDay} from '../utils/washScore'
 
-export function useCarWasAdvisior() {
-	const [location, setLocation] = useState(null)
+export function useCarWasAdvisor() {
+	const [location, setLocation] = useState<L.LatLng | null>(null)
 	const [recommendations, setRecommendations] = useState<WashDay[]| null>(null)
 	const [optimalWashDay, setOptimalWashDay] = useState<WashDay | null>(null)
 
@@ -15,6 +15,7 @@ export function useCarWasAdvisior() {
 	const validate = () => {
 		if (!location) {
 			setError('Missing location')
+			setLoading(false)
 			return false
 		}
 		return true
@@ -27,28 +28,22 @@ export function useCarWasAdvisior() {
 		if (!validate()) return 
 		try {
 			const forecasts : DayForecast[] = await getForecast(location.lat, location.lng)
+			const washDays: WashDay[] = forecasts.map((dayForecast) => ({
+				forecast: dayForecast,
+				score: calculateDailyScore(dayForecast)
 
-			const daysScored : WashScore[] = []
-
-			forecasts.map((dayForecast : DayForecast, i : number) => {
-				daysScored[i] = calculateDailyScore(dayForecast)
-			})
-
-			const washDays : WashDay [] = []
-
-			daysScored.map((dayScored: WashScore , i : number) => {
-				washDays[i] = { forecast: forecasts[i], score: dayScored } 
-			})
-
+			}))
 			const optimalWashDay : WashDay = getOptimalWashDay(washDays) 
+
 			setRecommendations(washDays)
 			setOptimalWashDay(optimalWashDay)
 			setError('')
 		} catch (error) {
 			setError(error.message)
+		} finally {
+			setLoading(false)
 		}
 
-		setLoading(false)
 	}
 
 	return {

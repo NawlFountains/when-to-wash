@@ -24,10 +24,7 @@ describe('Unit test - OpenMeteo API', () => {
 		})
 
 		afterEach(() => {
-			vi.mocked(fetch).mockResolvedValue({
-				ok:true,
-				json: async () => mockResponse
-			} as Response)
+			vi.unstubAllGlobals()
 		})
 
 		it('calls the correct url with lat and lon params', async () => {

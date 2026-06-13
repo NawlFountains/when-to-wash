@@ -1,6 +1,9 @@
 import { useMapEvents } from 'react-leaflet'
 
-export default function LocationPicker({ onLocationSelect }) {
+interface LocationPickerProps {
+	onLocationSelect: (latlng: L.LatLng) => void
+}
+export default function LocationPicker({ onLocationSelect }: LocationPickerProps) {
 	useMapEvents({
 		click(e) {
 			onLocationSelect(e.latlng)
