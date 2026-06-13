@@ -1,18 +1,29 @@
 import { useState } from 'react'
-import { MapContainer, TileLayer } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker } from 'react-leaflet'
+import { divIcon } from 'leaflet'
 import LocationPicker from './components/LocationPicker'
 import { useCarWasAdvisior } from './hooks/useCarWashAdvisor'
+import WashDayGrid from './components/WashDayGrid'
 
 function App() {
+	const pinIcon= divIcon({
+		html: `
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32">
+			<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#d65d0e" stroke="#7c5200" stroke-width="1"/>
+		<circle cx="12" cy="9" r="2.5" fill="#fbf1c7"/>
+		</svg>
+		`,
+		className: '',
+		iconSize: [32, 32],
+		iconAnchor: [16, 32],
+	})
 	const { location,
 		setLocation,
-		forecast,
-		daysToForecast,
-		setDaysToForecast,
-		recommendation,
+		recommendations,
 		loading,
+		optimalWashDay,
 		error,
-		handleRecommendation } = useCarWasAdvisior()
+		handleRecommendations } = useCarWasAdvisior()
 
   return (
     <>
@@ -31,13 +42,14 @@ function App() {
 				    url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
 				    />
 				    <LocationPicker onLocationSelect={setLocation} />
+				    {location && (<Marker position={[location.lat, location.lng]} icon={pinIcon} />)}
 
 			    </MapContainer>
 			    {location && (
-			<div className='text-center'>
-			Selected Lat: {location.lat.toFixed(4)}, Lng: {location.lng.toFixed(4)}
-			</div>
-		      )}
+				    <div className='text-center p-2'>
+				    Selected Lat: {location.lat.toFixed(4)}, Lon: {location.lng.toFixed(4)}
+				    </div>
+			    )}
 		    </div>
 
 		    <div className='p-2 bg-gruv-fg0 w-full shadow-lg shadow-gruv-bg2/40 mx-auto rounded-lg flex flex-col gap-4'>
@@ -46,14 +58,23 @@ function App() {
 			    </h2>
 
 			    <div className='flex flex-col md:flex-row w-full gap-4'>
-				<input className='bg-gruv-fg0 rounded-md text-center flex-1' placeholder='7' value={daysToForecast} onChange={(e) => setDaysToForecast(Number(e.target.value))} />
 				<button 
-					onClick={handleRecommendation}
-					className='bg-gruv-orange text-gruv-fg1 p-2 px-4 rounded-sm flex-1 hover:bg-gruv-fg1 hover:text-gruv-bg2 cursor-pointer transition duration-200'>
-					Calculate
+					onClick={handleRecommendations}
+					disabled={loading}
+					className={`${loading ? 'bg-gruv-fg2 text-gruv-bg1' : 'bg-gruv-orange text-gruv-fg1' } p-2 px-4 rounded-sm flex-1 hover:bg-gruv-fg1 hover:text-gruv-bg2 cursor-pointer transition duration-200`}>
+					{loading ? 'Calculating' : 'Calculate'}
 				</button>
 			    </div>
 		    </div>
+		    {error && (<p className='text-gruv-red'>{error}</p>)}
+		    {optimalWashDay && (
+			<div>
+			Optimal wash day is {optimalWashDay.forecast.date}
+			</div>
+		    )}
+		    {recommendations && (
+			<WashDayGrid washDays={recommendations}/>
+		    )}
 	    </div>
     </div>
     </>
