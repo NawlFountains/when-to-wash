@@ -8,6 +8,10 @@
 ![Playwright](https://img.shields.io/badge/Playwright-45ba4b?style=for-the-badge&logo=playwright&logoColor=white)
  
 A frontend React app that helps you decide the best day to wash your car based on the weather forecast for any location in the world.
+
+## Demo
+
+[Live demo](https://when-to-wash-iota.vercel.app/)
  
 ## How it works
  
