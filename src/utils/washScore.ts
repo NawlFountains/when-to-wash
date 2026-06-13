@@ -48,27 +48,29 @@ export function getOptimalWashDay(days: WashDay[]): WashDay | null {
 	}
 
 	let bestDay: WashDay | null = null
-	let highestScore = 0
+	let maxWindowSize = 0
+	let futureCleanDays = 0
 
 
-	for (let i = 0; i < days.length; i++) {
-		const currentDay = days[i]
+	for (let i = days.length - 1; i >= 0; i--) {
+		const currentDayPoints = points[days[i].score.rating]
 		const nextDay = days[i + 1]
 
-		if (currentDay.score.rating === 'avoid') {
-			continue;
-		}
+		if (currentDayPoints === 0) { // Dirty car
+			futureCleanDays = 0
+		} else {
+			if (currentDayPoints >= 2) {
+				let currentWindowSize = futureCleanDays
 
-		let currentDayPoints = points[currentDay.score.rating]
+				if (currentWindowSize > maxWindowSize || !nextDay) {
+					maxWindowSize = currentWindowSize
+					bestDay = days[i]
+				}
+			}
 
-		if (nextDay && nextDay.score.rating === 'avoid') {
-			currentDayPoints = 0
+			futureCleanDays++
 		}
-
-		if (currentDayPoints > highestScore) {
-			highestScore = currentDayPoints
-			bestDay = currentDay
-		}
+		
 	}
 
 	return bestDay

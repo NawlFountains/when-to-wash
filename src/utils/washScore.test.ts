@@ -3,6 +3,13 @@ import type { WashScore, WashDay, WashRating } from '../types/wash'
 import type { DayForecast } from '../types/weather'
 import {calculateDailyScore, getOptimalWashDay} from './washScore'
 
+function mockWashDay(forecast: DayForecast, rating: string): WashDay {
+	const washRatingMock: WashRating = rating as WashRating
+	const washScoreMock: WashScore = { rating: washRatingMock, reasons: [''] }
+	const washDayMock : WashDay = { forecast: forecast, score: washScoreMock}
+	return washDayMock
+}
+
 describe('QA Unit Test - Wash Score', () => {
 
 	describe('calculateDailyScore()', () => {
@@ -105,7 +112,7 @@ describe('QA Unit Test - Wash Score', () => {
 				tempMin: 10,
 				weatherCode: 0
 			}
-
+			
 			const rainyDay: DayForecast = {
 				date: '2026-06-16',
 				precipitationProbability: 90,
@@ -117,8 +124,8 @@ describe('QA Unit Test - Wash Score', () => {
 			}
 
 			const weekMock: WashDay[] = [
-				{ forecast: greatDay, score: calculateDailyScore(greatDay) },
-				{ forecast: rainyDay, score: calculateDailyScore(rainyDay) }
+				mockWashDay(greatDay, 'great'),
+				mockWashDay(rainyDay, 'avoid')
 			]
 
 			const optimalDay = getOptimalWashDay(weekMock)
@@ -150,8 +157,8 @@ describe('QA Unit Test - Wash Score', () => {
 			}
 
 			const weekMock: WashDay[] = [
-				{ forecast: rainyDay, score: calculateDailyScore(rainyDay) },
-				{ forecast: greatDay, score: calculateDailyScore(greatDay) }
+				mockWashDay(rainyDay, 'avoid'),
+				mockWashDay(greatDay, 'great')
 			]
 
 			const expectedWashDay: WashDay = weekMock[1]
@@ -161,6 +168,138 @@ describe('QA Unit Test - Wash Score', () => {
 		})
 
 
+		it('if sunny after rainy then return sunny day', () => {
+
+			const firstGreatDay: DayForecast = {
+				date: '2026-06-13',
+				precipitationProbability: 10,
+				precipitationSum: 0,
+				windspeedMax: 5,
+				tempMax: 15,
+				tempMin: 10,
+				weatherCode: 0
+			}
+
+			const rainyDay: DayForecast = {
+				date: '2026-06-14',
+				precipitationProbability: 90,
+				precipitationSum: 8.0,
+				windspeedMax: 5,
+				tempMax: 11,
+				tempMin: 10,
+				weatherCode: 61
+			}
+
+
+			const secondGreatDay: DayForecast = {
+				date: '2026-06-16',
+				precipitationProbability: 10,
+				precipitationSum: 0,
+				windspeedMax: 5,
+				tempMax: 15,
+				tempMin: 10,
+				weatherCode: 0
+			}
+
+			const weekMock: WashDay[] = [
+				mockWashDay(firstGreatDay, 'great'),
+				mockWashDay(rainyDay, 'avoid'),
+				mockWashDay(secondGreatDay, 'great'),
+			]
+
+			const expectedWashDay: WashDay = weekMock[2]
+			const optimalDay = getOptimalWashDay(weekMock)
+
+			expect(optimalDay).toBe(expectedWashDay)
+		})
+
+		it('Two good days followed by rain and one good day followed by two windy days', () => {
+
+			const firstGreatDay: DayForecast = {
+				date: '2026-06-13',
+				precipitationProbability: 10,
+				precipitationSum: 0,
+				windspeedMax: 5,
+				tempMax: 15,
+				tempMin: 10,
+				weatherCode: 0
+			}
+
+			const secondGreatDay: DayForecast = {
+				date: '2026-06-14',
+				precipitationProbability: 10,
+				precipitationSum: 0,
+				windspeedMax: 5,
+				tempMax: 15,
+				tempMin: 10,
+				weatherCode: 0
+			}
+
+			const firstRainyDay: DayForecast = {
+				date: '2026-06-15',
+				precipitationProbability: 90,
+				precipitationSum: 8.0,
+				windspeedMax: 5,
+				tempMax: 11,
+				tempMin: 10,
+				weatherCode: 61
+			}
+
+			const mildWindDay: DayForecast = {
+				date: '2026-06-16',
+				precipitationProbability: 0,
+				precipitationSum: 1,
+				windspeedMax: 15,
+				tempMax: 11,
+				tempMin: 10,
+				weatherCode: 3
+			}
+
+			const firstWindyDay: DayForecast = {
+				date: '2026-06-17',
+				precipitationProbability: 8,
+				precipitationSum: 0.2,
+				windspeedMax: 30,
+				tempMax: 11,
+				tempMin: 10,
+				weatherCode: 3
+			}
+
+			const secondWindyDay: DayForecast = {
+				date: '2026-06-18',
+				precipitationProbability: 8,
+				precipitationSum: 0.2,
+				windspeedMax: 30,
+				tempMax: 11,
+				tempMin: 10,
+				weatherCode: 3
+			}
+
+			const secondRainyDay: DayForecast = {
+				date: '2026-06-19',
+				precipitationProbability: 90,
+				precipitationSum: 8.0,
+				windspeedMax: 5,
+				tempMax: 11,
+				tempMin: 10,
+				weatherCode: 61
+			}
+
+			const weekMock: WashDay[] = [
+				mockWashDay(firstGreatDay, 'great'),
+				mockWashDay(secondGreatDay, 'great'),
+				mockWashDay(firstRainyDay, 'avoid'),
+				mockWashDay(mildWindDay, 'good'),
+				mockWashDay(firstWindyDay, 'poor'),
+				mockWashDay(secondWindyDay, 'poor'),
+				mockWashDay(secondRainyDay, 'avoid')
+			]
+
+			const expectedWashDay: WashDay = weekMock[3]
+			const optimalDay = getOptimalWashDay(weekMock)
+
+			expect(optimalDay).toBe(expectedWashDay)
+		})
 
 	})
 })
