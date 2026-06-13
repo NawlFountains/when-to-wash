@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { DayForecast } from '../types/weather'
-import type { WashDay, WashScore } from '../types/wash'
+import type { WashDay } from '../types/wash'
 import {getForecast} from '../utils/weatherForecast'
 import {calculateDailyScore, getOptimalWashDay} from '../utils/washScore'
 
@@ -27,19 +27,24 @@ export function useCarWasAdvisor() {
 		setOptimalWashDay(null)
 		if (!validate()) return 
 		try {
+			if (!location) return
 			const forecasts : DayForecast[] = await getForecast(location.lat, location.lng)
 			const washDays: WashDay[] = forecasts.map((dayForecast) => ({
 				forecast: dayForecast,
 				score: calculateDailyScore(dayForecast)
 
 			}))
-			const optimalWashDay : WashDay = getOptimalWashDay(washDays) 
+			const optimalWashDay : WashDay | null = getOptimalWashDay(washDays) 
 
 			setRecommendations(washDays)
 			setOptimalWashDay(optimalWashDay)
 			setError('')
 		} catch (error) {
-			setError(error.message)
+			if (error instanceof Error) {
+				setError(error.message)
+			} else {
+				setError('An unknown error occured')
+			}
 		} finally {
 			setLoading(false)
 		}

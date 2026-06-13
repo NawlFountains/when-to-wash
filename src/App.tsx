@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import { divIcon } from 'leaflet'
 import LocationPicker from './components/LocationPicker'
