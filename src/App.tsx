@@ -3,6 +3,7 @@ import { divIcon } from 'leaflet'
 import LocationPicker from './components/LocationPicker'
 import { useCarWasAdvisor } from './hooks/useCarWashAdvisor'
 import WashDayGrid from './components/WashDayGrid'
+import ForecastCard from './components/ForecastCard'
 
 const pinIcon= divIcon({
 		html: `
@@ -69,12 +70,17 @@ function App() {
 		    </div>
 		    {error && (<p className='text-gruv-red'>{error}</p>)}
 		    {recommendations && (
-			    <div className='flex flex-col gap-2'>
+			    <div className='flex flex-col gap-4'>
 			    <div className='text-center'>
 			    {optimalWashDay ? (
+				    <div className='flex flex-col bg-gruv-fg0 rounded-lg p-2 w-full gap-4'>
 				    <p>
-				    Optimal wash day is {optimalWashDay.forecast.date.split('-').reverse().join('/')}
+				    Optimal wash day is 
 				    </p>
+				    <div className='w-40 mx-auto border border-gruv-fg3 rounded-xl'>
+				    <ForecastCard dayForecast={optimalWashDay.forecast}/>
+				    </div>
+				    </div>
 			    ) : (
 				<p>It's not a good week to wash your car</p>	
 			    )}
